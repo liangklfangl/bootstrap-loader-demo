@@ -64,6 +64,19 @@ if (bootstraprcCustomLocation) {
 
 ![](./preview.PNG)
 
+### Description of Branch daily/0.0.1
+
+In branch of daily/0.0.1, you can see that we extract css  to an individual file which you can find in *public/assets/common.css*. (You must first change app.js or other files to trigger HMR, then common.css will generate in that folder). You should also know that, in webpack configuration file of webpack.config.js, we do not need to add *extract-text-webpack-plugin* to plugins, bootstrap-loader will do that automatically. But, you need first to do that:
+```js
+env:
+  development:
+    extractStyles: true
+    //There is for testing, you should not extract css in dev mode
+  production:
+    extractStyles: true
+```
+
+
 
 
 Reference:

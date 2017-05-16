@@ -1,8 +1,11 @@
 const webpack = require('webpack');
 const path = require('path');
+require('babel-polyfill');
 const autoprefixer = require('autoprefixer');
 const bootstrapEntryPoints = require('./webpack.bootstrap.config.js');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
 //bootstrap configuration for webpack
+const customFile = path.join(__dirname,"bootstrap/.bootstraprc");
 console.log(`=> bootstrap-loader configuration: ${bootstrapEntryPoints.dev}`);
 // { dev: 'bootstrap-loader',
 //   prod: 'bootstrap-loader/extractStyles'
@@ -15,18 +18,20 @@ module.exports = {
     //https://github.com/HubSpot/tether
     //http://tether.io/
     'font-awesome-loader',
-    bootstrapEntryPoints.dev,
+    // bootstrapEntryPoints.dev,
+    `bootstrap-loader`,
+    // `bootstrap-loader/lib/bootstrap.loader?extractStyles&configFilePath=${customFile}!bootstrap-loader/no-op.js`,
     //将bootstrap的配置添加到webpack的entry中
     './app/scripts/app',
   ],
 
   output: {
     path: path.join(__dirname, 'public', 'assets'),
-    filename: 'app.js',
+    filename: '[name]-[chunkHash].js',
     publicPath: '/assets/',
   },
 
-  devtool: '#cheap-module-eval-source-map',
+  // devtool: '#cheap-module-eval-source-map',
 
   resolve: { extensions: ['*', '.js'] },
 
@@ -60,8 +65,72 @@ module.exports = {
 
   module: {
     rules: [
-      { test: /\.css$/, use: ['style-loader', 'css-loader', 'postcss-loader'] },
-      { test: /\.scss$/, use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'] },
+      {
+    test: /\.css$/,
+    loader: ExtractTextPlugin.extract({
+      fallback: 'style-loader',
+      use: [
+        {
+          loader: 'css-loader',
+          options: {
+            minimize: true,
+            modules: true,
+            sourceMap: 'inline',
+            importLoaders: 1,
+            localIdentName: '[name]__[local]__[hash:base64:5]',
+          },
+        },
+        {
+          loader:'less-loader',
+          options:{
+            sourceMap: 'inline'
+          }
+        }
+      ],
+    }),
+  },
+      {
+    test: /\.scss$/,
+    use: ExtractTextPlugin.extract({
+      fallback: 'style-loader',
+      use: [
+      {
+        loader:"style-loader",
+        options:{
+
+        }
+      },
+        {
+          loader: 'css-loader',
+          options: {
+            minimize: true,
+            modules: true,
+            importLoaders: 3,
+             sourceMap: 'inline',
+            localIdentName: '[name]__[local]__[hash:base64:5]'
+          },
+        },
+        {
+          loader:"postcss-loader",
+          options:{
+            sourceMap:true
+          }
+        },
+        {
+         loader:'sass-loader',
+         options:{
+         sourceMap: 'inline'
+         }
+        }
+        // {
+        //   loader: 'sass-resources-loader',
+        //   options: {
+        //     // resources: './app/assets/styles/app-variables.scss'
+        //   }
+        // }
+      ],
+    }),
+  },
       {
         test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         use: 'url-loader?limit=10000',

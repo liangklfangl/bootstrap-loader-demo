@@ -13,18 +13,18 @@ useFlexbox: true
 
 # Webpack loaders, order matters
 # Must coordinate with webpack loader for scss file
+#   
 styleLoaders:
   - style-loader
-  - css-loader
-  - postcss-loader
-  - sass-loader
+  - css-loader?sourceMap
+  - sass-loader?sourceMap
 
 # Extract styles to stand-alone css file
 # Different settings for different environments can be used,
 # It depends on value of [NODE_ENV] environment variable
 # This param can also be set in webpack config:
 #   entry: 'bootstrap-loader/extractStyles'
-extractStyles: false
+extractStyles: true
 # env:
 #   development:
 #     extractStyles: false
